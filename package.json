@@ -1,0 +1,14 @@
+{
+  "name": "conflux-checkout-mvp",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "dev": "concurrently --kill-others-on-fail \"npm run dev --prefix backend\" \"npm run dev --prefix frontend\"",
+    "build": "npm run build --prefix backend && npm run build --prefix sdk && npm run build --prefix frontend",
+    "typecheck": "npm run typecheck --prefix backend && npm run typecheck --prefix sdk",
+    "start": "concurrently --kill-others-on-fail \"npm run start --prefix backend\" \"npm run start --prefix frontend\""
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}
