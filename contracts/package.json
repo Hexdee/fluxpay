@@ -1,0 +1,24 @@
+{
+  "name": "@fluxpay-checkout/contracts",
+  "private": true,
+  "version": "0.1.0",
+  "type": "commonjs",
+  "scripts": {
+    "build": "hardhat compile",
+    "test": "hardhat test",
+    "deploy:espaceTestnet": "hardhat run --network espaceTestnet scripts/deploy.js",
+    "deploy:mock:espaceTestnet": "hardhat run --network espaceTestnet scripts/deploy-mock-usdt0.js",
+    "mint:mock:espaceTestnet": "hardhat run --network espaceTestnet scripts/mint-mock-usdt0.js",
+    "verify:espaceTestnet": "hardhat verify --network espaceTestnet"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "5.0.2"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-chai-matchers": "^2.0.8",
+    "@nomicfoundation/hardhat-ethers": "^3.0.8",
+    "@nomicfoundation/hardhat-verify": "^2.0.12",
+    "dotenv": "^16.4.5",
+    "hardhat": "^2.22.7"
+  }
+}
