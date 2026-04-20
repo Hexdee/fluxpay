@@ -192,3 +192,34 @@ export function paymentReceiptCustomerEmail(params: {
   });
 }
 
+export function paymentSucceededMerchantEmail(params: {
+  merchantName: string;
+  amount: string;
+  currency: string;
+  orderId: string | null;
+  paymentId: string;
+  customerEmail: string | null;
+  txHash: string | null;
+  dashboardUrl: string;
+}) {
+  const reference = params.orderId ?? params.paymentId;
+
+  return renderEmail({
+    subject: `Payment received - ${params.amount} ${params.currency}`,
+    preheader: `You received ${params.amount} ${params.currency} for ${reference}.`,
+    title: "Payment received",
+    greeting: `Hi ${params.merchantName},`,
+    paragraphs: [
+      "A customer completed a payment in your FluxPay checkout.",
+      `Amount: ${params.amount} ${params.currency}`,
+      `Reference: ${reference}`,
+      `Payment ID: ${params.paymentId}`,
+      params.customerEmail
+        ? `Customer email: ${params.customerEmail}`
+        : "Customer email: unavailable",
+      params.txHash ? `Transaction hash: ${params.txHash}` : "Transaction hash: unavailable",
+    ],
+    cta: { label: "View payment", href: params.dashboardUrl },
+    footerNote: "You can export details or issue refunds from the dashboard.",
+  });
+}

@@ -1,6 +1,10 @@
-# API Spec (MVP)
+# API Spec
 
-Base URL: `http://localhost:4000` (local dev)
+Fluxpay Backend API documentation
+
+## Baseurl
+
+https://fluxpay-7f5a.onrender.com
 
 ## Authentication
 

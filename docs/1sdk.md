@@ -1,5 +1,7 @@
 # JS SDK
 
+Fluxpay checkout javascript sdk
+
 ## Install
 
 ```bash

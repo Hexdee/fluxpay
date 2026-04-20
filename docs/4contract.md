@@ -1,8 +1,10 @@
-# Contract Spec (MVP)
+# Contract Spec
 
-Target: Conflux eSpace (EVM)
+Fluxpay smart contract specification
 
 ## Contract: PaymentProcessor
+
+Target: Conflux eSpace (EVM)
 
 ### Goals
 

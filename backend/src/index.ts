@@ -29,6 +29,7 @@ import {
   isEmailDeliveryEnabled,
   sendCustomerPaymentCreatedEmail,
   sendCustomerPaymentReceiptEmail,
+  sendMerchantPaymentSucceededEmail,
   sendPasswordResetCodeEmail,
   sendVerificationCodeEmail,
 } from './mailer.js';
@@ -1474,32 +1475,37 @@ app.post(
         return { status: 403 as const, payload: { error: 'Forbidden' } };
       }
 
-      payment.status = 'succeeded';
-      payment.txHash = entityId('tx');
-      payment.updatedAt = now;
-      const dashboardPayment = findDashboardPaymentByCheckoutId(
-        store,
-        payment.paymentId,
-        payment.merchantId,
-      );
-      if (dashboardPayment) {
-        markDashboardPaymentSucceeded(dashboardPayment, now, payment.txHash);
-        markPaymentLinkCompletion(store, dashboardPayment);
+      const previousStatus = payment.status;
+      if (payment.status !== 'succeeded') {
+        payment.status = 'succeeded';
+        payment.txHash = entityId('tx');
+        payment.updatedAt = now;
+        const dashboardPayment = findDashboardPaymentByCheckoutId(
+          store,
+          payment.paymentId,
+          payment.merchantId,
+        );
+        if (dashboardPayment) {
+          markDashboardPaymentSucceeded(dashboardPayment, now, payment.txHash);
+          markPaymentLinkCompletion(store, dashboardPayment);
+        }
       }
 
       return {
         status: 200 as const,
         payload: serializePayment(payment),
         payment,
+        transitioned: previousStatus !== payment.status,
       };
     });
 
-    if ('payment' in outcome && outcome.payment) {
-      await queueEventForMerchant(
-        'payment.succeeded',
-        outcome.payment,
-        authedReq.merchant,
-      );
+    if (
+      'payment' in outcome &&
+      outcome.payment &&
+      'transitioned' in outcome &&
+      outcome.transitioned
+    ) {
+      await queueEventForMerchant('payment.succeeded', outcome.payment, authedReq.merchant);
 
       const to = asString(outcome.payment.customerEmail).trim();
       if (
@@ -1516,6 +1522,20 @@ app.post(
           orderId: outcome.payment.merchantOrderId,
           paymentId: outcome.payment.paymentId,
           txHash: outcome.payment.txHash,
+        });
+      }
+
+      if (authedReq.merchant.notifyPaymentSucceeded) {
+        void sendMerchantPaymentSucceededEmail({
+          to: authedReq.merchant.email,
+          merchantName: authedReq.merchant.name,
+          amount: outcome.payment.amount,
+          currency: outcome.payment.currency,
+          orderId: outcome.payment.merchantOrderId,
+          paymentId: outcome.payment.paymentId,
+          customerEmail: outcome.payment.customerEmail,
+          txHash: outcome.payment.txHash,
+          dashboardUrl: `${config.webOrigin.replace(/\/$/, '')}/payments/detail?id=${outcome.payment.paymentId}`,
         });
       }
     }
@@ -2259,6 +2279,25 @@ app.post('/checkout/payments/:id/confirm', async (req, res) => {
             : 'payment.expired';
 
       await queueEventForMerchant(eventType, outcome.payment, merchant);
+    }
+
+    if (
+      merchant &&
+      outcome.transitioned &&
+      outcome.finalStatus === 'succeeded' &&
+      merchant.notifyPaymentSucceeded
+    ) {
+      void sendMerchantPaymentSucceededEmail({
+        to: merchant.email,
+        merchantName: merchant.name,
+        amount: outcome.payment.amount,
+        currency: outcome.payment.currency,
+        orderId: outcome.payment.merchantOrderId,
+        paymentId: outcome.payment.paymentId,
+        customerEmail: outcome.payment.customerEmail,
+        txHash: outcome.payment.txHash,
+        dashboardUrl: `${config.webOrigin.replace(/\/$/, '')}/payments/detail?id=${outcome.payment.paymentId}`,
+      });
     }
 
     // Best-effort: send a receipt email for terminal statuses.

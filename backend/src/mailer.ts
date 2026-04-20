@@ -3,6 +3,7 @@ import { config } from "./config.js";
 import {
   passwordResetCodeEmail,
   paymentCreatedCustomerEmail,
+  paymentSucceededMerchantEmail,
   paymentReceiptCustomerEmail,
   verificationCodeEmail,
 } from "./email-templates.js";
@@ -131,6 +132,30 @@ export function sendCustomerPaymentReceiptEmail(params: {
     orderId: params.orderId,
     paymentId: params.paymentId,
     txHash: params.txHash,
+  });
+  return sendEmail({ to: params.to, ...email });
+}
+
+export function sendMerchantPaymentSucceededEmail(params: {
+  to: string;
+  merchantName: string;
+  amount: string;
+  currency: string;
+  orderId: string | null;
+  paymentId: string;
+  customerEmail: string | null;
+  txHash: string | null;
+  dashboardUrl: string;
+}) {
+  const email = paymentSucceededMerchantEmail({
+    merchantName: params.merchantName,
+    amount: params.amount,
+    currency: params.currency,
+    orderId: params.orderId,
+    paymentId: params.paymentId,
+    customerEmail: params.customerEmail,
+    txHash: params.txHash,
+    dashboardUrl: params.dashboardUrl,
   });
   return sendEmail({ to: params.to, ...email });
 }
