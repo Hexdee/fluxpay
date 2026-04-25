@@ -1,10 +1,12 @@
 import Brand from '@/components/Brand';
+import BackendWarmup from '@/components/BackendWarmup';
 import Link from 'next/link';
 import { ChartUpIcon, CheckCircleIcon, CodeIcon } from '@/components/Icons';
 
 export default function HomePage() {
   return (
     <>
+      <BackendWarmup />
       <header className='site-header'>
         <div className='container header-inner'>
           <Brand />
@@ -18,7 +20,7 @@ export default function HomePage() {
             <Link className='btn btn-secondary' href='/docs'>
               View docs
             </Link>
-            <a className='btn btn-primary' href='/dashboard'>
+            <a className='btn btn-primary' href='/auth/sign-up'>
               Get Started
             </a>
           </div>
@@ -32,7 +34,7 @@ export default function HomePage() {
               <a href='#developers'>Developers</a>
               <a href='#pricing'>Pricing</a>
               <a href='#faq'>FAQ</a>
-              <a className='btn btn-primary' href='/dashboard'>
+              <a className='btn btn-primary' href='/auth/sign-up'>
                 Get Started
               </a>
             </div>
