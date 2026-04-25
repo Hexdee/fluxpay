@@ -20,7 +20,7 @@ export default function HomePage() {
             <Link className='btn btn-secondary' href='/docs'>
               View docs
             </Link>
-            <a className='btn btn-primary' href='/auth/sign-up'>
+            <a className='btn btn-primary' href='/dashboard'>
               Get Started
             </a>
           </div>
@@ -34,7 +34,7 @@ export default function HomePage() {
               <a href='#developers'>Developers</a>
               <a href='#pricing'>Pricing</a>
               <a href='#faq'>FAQ</a>
-              <a className='btn btn-primary' href='/auth/sign-up'>
+              <a className='btn btn-primary' href='/dashboard'>
                 Get Started
               </a>
             </div>

@@ -14,10 +14,19 @@ export default function BackendWarmup() {
     function ping() {
       if (cancelled) return;
 
+      const targets = [
+        "/health",
+        "/warmup?target=landing",
+        "/warmup?target=auth",
+        "/warmup?target=dashboard",
+        "/warmup?target=checkout",
+      ];
+      const endpoint = targets[Math.floor(Math.random() * targets.length)] ?? "/health";
+
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 4500);
 
-      fetch(`${API_BASE}/health`, {
+      fetch(`${API_BASE}${endpoint}`, {
         method: "GET",
         signal: controller.signal,
         headers: { "x-fluxpay-warmup": "1" },

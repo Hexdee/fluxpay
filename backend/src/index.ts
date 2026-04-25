@@ -970,6 +970,17 @@ app.get('/health', (_req, res) => {
   res.json({ ok: true, service: 'fluxpay-checkout-backend' });
 });
 
+app.get('/warmup', async (req, res) => {
+  const target = typeof req.query.target === 'string' ? req.query.target : 'default';
+  // Best-effort: touch the DB so the instance + pool are hot before users arrive.
+  try {
+    await readStore();
+  } catch {
+    // Ignore warmup failures (e.g. DB temporarily unavailable); caller just wants a wakeup.
+  }
+  res.json({ ok: true, service: 'fluxpay-checkout-backend', target });
+});
+
 app.post('/auth/signup', async (req, res) => {
   const parsed = signupSchema.safeParse(req.body);
   if (!parsed.success) {
